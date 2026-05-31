@@ -1,22 +1,31 @@
-import {Request, Response} from 'express';
+import { Request, Response } from "express";
+import authService from "../services/auth.service";
 
-const registerUser= async (req:Request,res:Response):Promise<void>=>{
-    try{
-        const{email,password,name}=req.body;
-        res.status(201).json({
-            status:'success',
-            message:'Controller Successfully intercepted the request',
-            data:{
-                email,
-                name
-            }
+const registerUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const newUser = await authService.registerUser(
+      req.body.name,
+      req.body.email,
+      req.body.password,
+    );
+    const { password, ...userWithoutPassword } = newUser.toObject();
+    res.status(201).json({
+      status: "success",
+      message: "User registered successfully",
+      data: userWithoutPassword,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+        res.status(400).json({
+          status: "fail",
+          message: error.message,
         });
-    }
-    catch(error){
+      } else {
         res.status(500).json({
-            status:'error',
-            message:'Internal Server Error'
+          status: "error",
+          message: "Internal Server Error",
         });
+      }
     }
-}
-export {registerUser};
+  };
+export { registerUser };

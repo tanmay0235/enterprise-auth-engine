@@ -1,8 +1,22 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema({
+interface IUser extends Document {
+  name: string;
+  email: string;
+  password: string;
+}
+
+const userSchema = new mongoose.Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
 });
-export const User = mongoose.model("User", userSchema);
+
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) {
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password as string, salt);
+});
+export const User = mongoose.model<IUser>("User", userSchema);

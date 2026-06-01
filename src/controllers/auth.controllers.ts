@@ -16,16 +16,41 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error) {
     if (error instanceof Error) {
-        res.status(400).json({
-          status: "fail",
-          message: error.message,
-        });
-      } else {
-        res.status(500).json({
-          status: "error",
-          message: "Internal Server Error",
-        });
-      }
+      res.status(400).json({
+        status: "fail",
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        status: "error",
+        message: "Internal Server Error",
+      });
     }
-  };
-export { registerUser };
+  }
+};
+
+const loginUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = await authService.loginUser(req.body.email, req.body.password);
+    const { password, ...userWithoutPassword } = user.toObject();
+    res.status(200).json({
+      status: "success",
+      message: "User logged in successfully",
+      data: userWithoutPassword,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        status: "fail",
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        status: "error",
+        message: "Internal Server Error",
+      });
+    }
+  }
+};
+
+export { registerUser, loginUser };

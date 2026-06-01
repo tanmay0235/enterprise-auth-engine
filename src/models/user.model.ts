@@ -5,6 +5,7 @@ interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -15,8 +16,16 @@ const userSchema = new mongoose.Schema<IUser>({
 
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) {
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password as string, salt);
 });
+
+userSchema.methods.comparePassword = async function (
+  candidatePassword: string,
+) {
+  return bcrypt.compare(candidatePassword, this.password as string);
+};
+
 export const User = mongoose.model<IUser>("User", userSchema);

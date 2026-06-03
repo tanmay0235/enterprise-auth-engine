@@ -6,11 +6,13 @@ import { loginUser } from "../controllers/auth.controllers";
 import { loginSchema } from "../schemas/auth.schema";
 import { getProfile } from "../controllers/auth.controllers";
 import { requireAuth } from "../middlewares/auth.middleware";
+import { refreshAuthToken } from "../controllers/auth.controllers";
 
 const router = Router();
 
 router.post("/register", validate(registerSchema), registerUser);
 router.post("/login", validate(loginSchema), loginUser);
+router.post("/refresh-token", refreshAuthToken);
 router.get("/profile", requireAuth, getProfile);
 
 export default router;
